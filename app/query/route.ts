@@ -1,26 +1,28 @@
-// import postgres from 'postgres';
+// app/query/route.ts
+import postgres from 'postgres';
+import { NextResponse } from 'next/server';
 
-// const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+// Initialize Postgres client
+const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
-// async function listInvoices() {
-// 	const data = await sql`
-//     SELECT invoices.amount, customers.name
-//     FROM invoices
-//     JOIN customers ON invoices.customer_id = customers.id
-//     WHERE invoices.amount = 666;
-//   `;
+// Query function to list invoices
+async function listInvoices() {
+  const data = await sql`
+    SELECT invoices.amount, customers.name
+    FROM invoices
+    JOIN customers ON invoices.customer_id = customers.id
+    WHERE invoices.amount = 666;
+  `;
+  return data;
+}
 
-// 	return data;
-// }
-
+// GET route handler
 export async function GET() {
-  return Response.json({
-    message:
-      'Uncomment this file and remove this line. You can delete this file when you are finished.',
-  });
-  // try {
-  // 	return Response.json(await listInvoices());
-  // } catch (error) {
-  // 	return Response.json({ error }, { status: 500 });
-  // }
+  try {
+    const result = await listInvoices();
+    return NextResponse.json(result); // Return query result
+  } catch (error) {
+    console.error('Query failed:', error);
+    return NextResponse.json({ error: 'Database query failed' }, { status: 500 });
+  }
 }
